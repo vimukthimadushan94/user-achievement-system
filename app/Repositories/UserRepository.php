@@ -68,11 +68,11 @@ class UserRepository
             $nextCommentValueRange = $commentAchivCategory->max_value+1;
 
             $nextLessonAchiement = LessonAchievement::where('min_value','<=',$nextLessonValueRange)
-                ->where('max_value','>',$nextLessonValueRange)
+                ->where('max_value','>=',$nextLessonValueRange)
                 ->first();
 
             $nextCommentAchiement = CommentsAchievements::where('min_value','<=',$nextCommentValueRange)
-                ->where('max_value','>',$nextCommentValueRange)
+                ->where('max_value','>=',$nextCommentValueRange)
                 ->first();
 
             return [
@@ -88,13 +88,13 @@ class UserRepository
 
     public function getLessonAchievementByCount($count)
     {
-        $achievement = LessonAchievement::where('min_value','<=',$count)->where('max_value','>',$count)->first();
+        $achievement = LessonAchievement::where('min_value','<=',$count)->where('max_value','>=',$count)->first();
         return $achievement;
     }
 
     public function getCommentAchievementByCount($count)
     {
-        $achievement = CommentsAchievements::where('min_value','<=',$count)->where('max_value','>',$count)->first();
+        $achievement = CommentsAchievements::where('min_value','<=',$count)->where('max_value','>=',$count)->first();
         return $achievement;
     }
 
@@ -106,14 +106,13 @@ class UserRepository
         $currentBadge = $this->getCurrentUserBadge($user,$totalAchievements);
 
         $nextBadgeStartRange = $currentBadge->max_value+1;
-        $nextBadge = Badge::where('min_value','<=',$nextBadgeStartRange)->where('max_value','>',$nextBadgeStartRange)->first();
-        return $nextBadge->name;
+        return Badge::where('min_value','<=',$nextBadgeStartRange)->where('max_value','>=',$nextBadgeStartRange)->first();
 
     }
 
     public function getCurrentUserBadge($user,$count)
     {
-        return Badge::where('min_value','<=',$count)->where('max_value','>',$count)->first();
+        return Badge::where('min_value','<=',$count)->where('max_value','>=',$count)->first();
     }
 
     /**
@@ -123,6 +122,14 @@ class UserRepository
     public function getTotalAchievements($user)
     {
         return $user->watched->count()+$user->writtenComments->count();
+    }
+
+    public function getRemainingToNextBadge($user)
+    {
+        $totalAchievements = $this->getTotalAchievements($user);
+
+        $nextBadge = $this->getNextBadge($user);
+        return $nextBadge->min_value - $totalAchievements;
     }
 
 }
