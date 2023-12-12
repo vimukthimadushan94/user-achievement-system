@@ -17,16 +17,6 @@ class UserRepository
         $this->user = $user;
     }
 
-    public function getAllUsers()
-    {
-        return $this->user->all();
-    }
-
-    public function getUserById($id)
-    {
-        return $this->user->find($id);
-    }
-
     /**
      * @param $user
      * @return string
@@ -88,14 +78,12 @@ class UserRepository
 
     public function getLessonAchievementByCount($count)
     {
-        $achievement = LessonAchievement::where('min_value','<=',$count)->where('max_value','>=',$count)->first();
-        return $achievement;
+        return LessonAchievement::where('min_value','<=',$count)->where('max_value','>=',$count)->first();
     }
 
     public function getCommentAchievementByCount($count)
     {
-        $achievement = CommentsAchievements::where('min_value','<=',$count)->where('max_value','>=',$count)->first();
-        return $achievement;
+        return CommentsAchievements::where('min_value','<=',$count)->where('max_value','>=',$count)->first();
     }
 
     public function getNextBadge($user)
