@@ -10,6 +10,12 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+    //user Badges
+    const BEGINNER = 'Beginner';
+    const INTERMEDIATE = 'Intermediate';
+    const ADVANCED = 'Advanced';
+    const MASTER = 'Master';
+
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -65,6 +71,11 @@ class User extends Authenticatable
     public function watched()
     {
         return $this->belongsToMany(Lesson::class)->wherePivot('watched', true);
+    }
+
+    public function writtenComments()
+    {
+        return $this->belongsToMany(Comment::class)->wherePivot('written', true);
     }
 }
 
