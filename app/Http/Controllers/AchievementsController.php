@@ -21,7 +21,7 @@ class AchievementsController extends Controller
             'unlocked_achievements' => $this->userRepository->getUnlockedAchievements($user),
             'next_available_achievements' => $this->userRepository->getNextAvailableAchievements($user),
             'current_badge' => $this->userRepository->getCurrentBadge($user),
-            'next_badge' => '',
+            'next_badge' => $this->userRepository->getNextBadge($user),
             'remaing_to_unlock_next_badge' => 0
         ]);
     }

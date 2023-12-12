@@ -10,11 +10,6 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    //user Badges
-    const BEGINNER = 'Beginner';
-    const INTERMEDIATE = 'Intermediate';
-    const ADVANCED = 'Advanced';
-    const MASTER = 'Master';
 
     use HasApiTokens, HasFactory, Notifiable;
 

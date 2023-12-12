@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Badge;
 use App\Models\CommentsAchievements;
 use App\Models\LessonAchievement;
 use App\Models\User;
@@ -34,27 +35,9 @@ class UserRepository
     public function getCurrentBadge($user)
     {
         $totalAchievements = $user->watched->count()+$user->writtenComments->count();
-        switch (true) {
-            case ($totalAchievements >= 10):
-                $result = User::MASTER;
-                break;
-            case ($totalAchievements >= 8):
-                $result = User::ADVANCED;
-                break;
 
-            case ($totalAchievements >= 4):
-                $result = User::INTERMEDIATE;
-                break;
-
-            case ($totalAchievements >= 0):
-                $result = User::BEGINNER;
-                break;
-
-            default:
-                $result = User::BEGINNER;
-        }
-
-        return $result;
+        $badge = $this->getCurrentUserBadge($user,$totalAchievements);
+        return $badge->name;
     }
 
     /**
@@ -67,6 +50,11 @@ class UserRepository
         return $user->watched->pluck('title')->merge($user->writtenComments->pluck('body'));
     }
 
+    /**
+     * @param $user
+     * @return array
+     * get the next achievements
+     */
     public function getNextAvailableAchievements($user)
     {
         try {
@@ -75,7 +63,7 @@ class UserRepository
             $lessonAchivCategory = $this->getLessonAchievementByCount($lessonAchievementsCount);
             $commentAchivCategory = $this->getCommentAchievementByCount($commentAchievementsCount);
 
-            //this value refers to the next level value range
+            //these value refers to the next level value range.Next levels should be within those values
             $nextLessonValueRange = $lessonAchivCategory->max_value+1;
             $nextCommentValueRange = $commentAchivCategory->max_value+1;
 
@@ -88,7 +76,8 @@ class UserRepository
                 ->first();
 
             return [
-                $nextLessonAchiement->name,$nextCommentAchiement->name
+                $nextLessonAchiement->name,
+                $nextCommentAchiement->name
             ];
         }catch (\Exception $exception){
             Log::error($exception->getMessage());
@@ -107,6 +96,33 @@ class UserRepository
     {
         $achievement = CommentsAchievements::where('min_value','<=',$count)->where('max_value','>',$count)->first();
         return $achievement;
+    }
+
+    public function getNextBadge($user)
+    {
+        $totalAchievements = $this->getTotalAchievements($user);
+
+        //get the current badge
+        $currentBadge = $this->getCurrentUserBadge($user,$totalAchievements);
+
+        $nextBadgeStartRange = $currentBadge->max_value+1;
+        $nextBadge = Badge::where('min_value','<=',$nextBadgeStartRange)->where('max_value','>',$nextBadgeStartRange)->first();
+        return $nextBadge->name;
+
+    }
+
+    public function getCurrentUserBadge($user,$count)
+    {
+        return Badge::where('min_value','<=',$count)->where('max_value','>',$count)->first();
+    }
+
+    /**
+     * @param $user
+     * @return mixed
+     */
+    public function getTotalAchievements($user)
+    {
+        return $user->watched->count()+$user->writtenComments->count();
     }
 
 }
