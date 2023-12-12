@@ -48,4 +48,9 @@ class UserRepository
 
         return $result;
     }
+
+    public function getUnlockedAchievements($user)
+    {
+        return $user->watched->pluck('title')->merge($user->writtenComments->pluck('body'));
+    }
 }
